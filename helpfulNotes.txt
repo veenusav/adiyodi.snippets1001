@@ -1,0 +1,68 @@
+This notes are made to give some hint on setting up certain systems.
+for example: vite based react application.
+
+
+2024 05-------------------
+Creating a react application with vite (French. Prounce as veet)
+
+npm create vite@latest
+{
+    It prompts for project name, give projectname as the folder to be created.
+    then give framework as react and varient as JS. (typescript is also there.)
+}
+command prompt reappears.
+{
+    There will be the subfolder. cd to that subfolder.
+}
+npm install
+{
+    this will do a few installations. some waring might b there. 
+    sample output:
+    npm WARN deprecated inflight@1.0.6: This module is not 
+    supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce 
+    async requests by a key value, which is much more comprehensive and powerful.
+    npm WARN deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+    npm WARN deprecated glob@7.2.3: Glob versions prior to 
+    v9 are no longer supported.
+
+    
+    added 278 packages, and audited 279 packages in 37s    
+
+    103 packages are looking for funding
+    run `npm fund` for details
+
+    found 0 vulnerabilities
+}
+npm run dev
+{
+    will execute the jsx files and host a webserver. 
+    sample output:
+    PS F:\workspace.learn.react\proj1\react-plotly-00> npm run dev
+
+    > react-plotly-00@0.0.0 dev
+    > vite
+
+    VITE v5.2.12  ready in 597 ms
+    ➜  Local:   http://localhost:5173/
+    ➜  Network: use --host to expose
+    ➜  press h + enter to show help
+}
+
+Open the url on a browser
+
+-----------
+If you are using plotly plotly with react...
+
+npm install react-plotly.js plotly.js
+{
+    PS F:\workspace.learn.react\proj1\react-plotly-00> npm install react-plotly.js plotly.js
+    npm WARN deprecated mumath@3.3.4: Redundant dependency in your project.
+
+    added 231 packages, and audited 510 packages in 1m
+
+    115 packages are looking for funding
+    run `npm fund` for details
+
+    found 0 vulnerabilities
+}
+2024 05-------------------
