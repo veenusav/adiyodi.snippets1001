@@ -1,7 +1,19 @@
 import './App.css'
 import Plot from 'react-plotly.js';
+import React, { useEffect, useState } from 'react';
 
 function App() {
+  const [data, setData] = useState({ x: [], y: [], z: [] });
+  useEffect(() => {
+    //note: this url is configured in vite.config.js for a redirection
+    //  Redirection to the python server which runs on a different port.
+    // This is to avoid CORS issues. otherwise we could give full url with port here itself.
+    fetch('/api/data') 
+      .then(response => response.json())
+      .then(data => setData(data))
+      .catch(error => console.error('Error fetching data:', error));
+  }, []);
+  
   return (
     <>
       <Plot
@@ -11,9 +23,9 @@ function App() {
             colorbar: { title: "power(dB)" },
             colorscale: "Jet",
             hoverinfo: "x+y+z",
-            x: [-5, 2, 5,3],
-            y: [10,10,10,10,10,10,20,20, 12,12,12,12,12,12,12,12, 0,0,0,0,0,0,0,0,],
-            z: [1000, 400, 0],
+            x: data.x,
+            y: data.y,
+            z: data.z,
           },
         ]}
         layout={
