@@ -18,7 +18,7 @@ function App() {
         ]}
         layout={
           {
-            title: 'RD data..',
+            title: 'conceptual heatmap',
             width: 320,
             height: 695 - 45,
             plot_bgcolor: "black",
