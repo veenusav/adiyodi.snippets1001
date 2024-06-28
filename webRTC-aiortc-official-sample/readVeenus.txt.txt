@@ -1,0 +1,18 @@
+2024/06
+
+This code is 99.9% from the official sample
+
+https://github.com/aiortc/aiortc/tree/main/examples/webcam
+
+
+to run with a sample video file, just give :
+python webcam.py --play-from E:\temp\Movies\Sherlock.Holmes.A.Game.Of.Shadows.2011.1080P.Brrip.X264.Yify-1.m4v
+
+same thing is there with launch.json for visual studio code.
+
+
+To open the client on the web browser
+
+http://localhost:8080
+OR 
+http://127.0.0.1:8080

@@ -1,0 +1,17 @@
+You need to run the server part using python first. it will give websocket at localhost 8080
+python videocast.py
+
+Beware there is hard coded media file in the python file. please point it to a meaningful file in your pc before running it.
+Please check for VIDEO_FILE_TO_CAST.
+
+Then run the react client which is based on vite and npm. 
+npm run dev
+
+The above must have running a server which will give UI screen for the browser.
+
+Now both systems are running. 
+
+take a browser and open the following url. the port number should be corrected with the one listed by the npm server.
+http://localhost:5173/
+
+if everything works fine, you can see the media running without audio on the browser.
