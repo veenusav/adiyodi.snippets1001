@@ -11,36 +11,60 @@ function App() {
   const [payloadSize, setPayloadSize] = useState(0);
 
   useEffect(() => {
+    
     const pc = new RTCPeerConnection();
     console.log("Created RTCPeerConnection.")
+    console.log("About to create websocket: ",websocketurl)
+    const ws = new WebSocket(websocketurl);
+
     const start = async () => {
       const offer = await pc.createOffer();
       console.log("pc.createOffer done.")
       await pc.setLocalDescription(offer);
-      console.log("pc.setLocalDescription done. about to create websocket: ",websocketurl)
-
-      const ws = new WebSocket(websocketurl);
+      console.log("pc.setLocalDescription done.")
       ws.onopen = () => {
+        pc.onicecandidate = ({ candidate }) => {
+          console.log("pc.onicecandidate() initiated.");
+          if (candidate) {
+            console.log("candidate=",candidate);
+            ws.send(JSON.stringify({
+              type: 'candidate',
+              id: candidate.sdpMid,
+              label: candidate.sdpMLineIndex,
+              candidate: candidate.candidate
+            }));
+          }
+        };        
         console.log("sending offer through websocket: ", websocketurl)
         console.log("offer: ", offer)
-        // const offerData = { sdp: offer.sdp.replace(/\r?\n/g, '\\n'), type: offer.type };
-
-        // const offerData1 = { sdp: offer.sdp.replace(/\r/g, ' '), type: offer.type };
-        // const offerData = { sdp: offerData1.sdp.replace(/\n/g, ' '), type: offer.type };
-
         const offerData = { sdp: offer.sdp.replace(/\r?\n/g, '\n'), type: offer.type };
-
         console.log("offerData to send: ", offerData)
         ws.send(JSON.stringify(offerData));        
         // ws.send(JSON.stringify(offer));   
       };
 
       ws.onmessage = async (event) => {
-        console.log("received answer through websocket: ", websocketurl)
-        const answer = JSON.parse(event.data);
-        console.log("answer: ", answer);        
-        await pc.setRemoteDescription(new RTCSessionDescription(answer));
-        setConnected(true);
+        console.log("received data through websocket: ", websocketurl)
+        const data = JSON.parse(event.data);
+        console.log("data: ", data);                
+        if (data.type === 'answer') {
+          await pc.setRemoteDescription(new RTCSessionDescription(data))
+          .then(() => {
+            console.log("Success: Connection established. After the offer-answer handshaking.");
+            setConnected(true);
+          })
+          .catch(error => {
+            console.error("Error setting remote description:", error);
+            // Handle the error, e.g., display an error message to the user
+          });
+          
+        } else if (data.type === 'candidate') {
+          const candidate = new RTCIceCandidate({
+            sdpMLineIndex: data.label,
+            candidate: data.candidate
+          });
+          await pc.addIceCandidate(candidate);
+        }
       };
 
       ws.onclose = () => {
