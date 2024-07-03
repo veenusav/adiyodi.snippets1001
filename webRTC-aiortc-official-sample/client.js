@@ -63,16 +63,27 @@ function negotiate() {
 function start() {
     console.log(" 21")
     var config = {
-        sdpSemantics: 'unified-plan'
+        sdpSemantics: 'unified-plan',
+        iceServers: [], // Use empty iceServers array to avoid reliance on external STUN/TURN servers
+        iceTransportPolicy: 'all'  // Ensure we attempt to use all network paths (even though ICE servers list is empty)
     };
-
+      
     if (document.getElementById('use-stun').checked) {
-        console.log(" 22")
+        console.log(" 22.a")
         config.iceServers = [{ urls: ['stun:stun.l.google.com:19302'] }];
+    } else {
+        console.log(" 22.b")
     }
     console.log(" 23")
     pc = new RTCPeerConnection(config);
 
+    pc.oniceconnectionstatechange = () => {
+        if (pc.iceConnectionState === 'disconnected') {
+          console.log('ICE connection state is disconnected');
+          // Handle reconnection logic here if needed
+        }
+      };
+      
     // connect audio / video
     pc.addEventListener('track', (evt) => {
         console.log(" 24")

@@ -73,6 +73,16 @@ async def offer(request):
     pc = RTCPeerConnection()
     pcs.add(pc)
 
+    @pc.on('icecandidate')
+    async def on_icecandidate(candidate):
+        print("on_icecandidate ")            
+        if candidate:
+            print("candidate : ", candidate)            
+            # await websocket.send(json.dumps({'candidate': candidate.to_dict()}))
+            # note: there is no websocket in this logic. but it will be good 
+            # to share this icecandidate with my peer. for example through websocket, 
+            # http or signaling server.
+
     @pc.on("connectionstatechange")
     async def on_connectionstatechange():
         print("Connection state is %s" % pc.connectionState)
