@@ -1,0 +1,64 @@
+prompts.txt
+sample frame
+{123,456,789,014,56,76,22,46,12,456} //maximum elements will be 64 x 512 numbers
+
+The above is a data frame. this contains positive integers ranging from 0 to 65535.
+Each frame contains 64 x 512 numbers like a grayscale image of 64 x 512 16 bit pixels.
+There will be 750 frames in a array. 
+Want a react app which displays a frame at a time. for simplicity you may show 10 numbers from the frame. 
+With a time interval of 30 milliseconds, i want to change each frame. Also display FPS on the UI.
+Please hardcode the array of frames with some numbers. later I will fix the data supply part. dont bother now.
+
+environment: windows, vite, jsx
+
+response : see <resp77-01> at the end
+
+section: resp77-01 : code for data display
+
+import React, { useState, useEffect, useRef } from 'react';
+
+const FPS_INTERVAL = 1000; // milliseconds
+
+const FRAMES = [
+  // Replace with your actual 750 frames of data (64x512 numbers)
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+  [11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+  // ... add more frames here
+];
+
+function App() {
+  const [currentFrame, setCurrentFrame] = useState(0);
+  const [frameData, setFrameData] = useState([]);
+  const [fps, setFps] = useState(0);
+  const previousTimeRef = useRef(0);
+
+  useEffect(() => {
+    const handleFrameChange = () => {
+      const now = performance.now();
+      const elapsedTime = now - previousTimeRef.current;
+      previousTimeRef.current = now;
+
+      // Update FPS
+      setFps(Math.round(1000 / elapsedTime));
+
+      // Update current frame
+      setCurrentFrame((prevFrame) => (prevFrame + 1) % FRAMES.length);
+      setFrameData(FRAMES[currentFrame].slice(0, 10)); // Show only 10 numbers
+    };
+
+    const intervalId = setInterval(handleFrameChange, 30);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
+  return (
+    <div className="App">
+      <h1>Frame Viewer</h1>
+      <h2>Frame: {currentFrame + 1}</h2>
+      <h2>FPS: {fps}</h2>
+      <pre>{frameData.join(' ')}</pre>
+    </div>
+  );
+}
+
+export default App;
