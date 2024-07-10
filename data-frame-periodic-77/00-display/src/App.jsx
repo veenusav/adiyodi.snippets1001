@@ -1,6 +1,6 @@
 const DATA_PRODUCTION_FPS = 33;
 const FRAME_SIZE_IN_KB = 150;
-const NO_OF_FRAMES = 10;
+const NO_OF_FRAMES = 700;
 
 import React, { useState, useEffect, useRef } from 'react';
 import sizeof from 'object-sizeof';
@@ -100,7 +100,6 @@ function App() {
       <h2>Current         FPS: {fps}</h2>
       <h2>Average         FPS: {averageFps.toFixed(2)}</h2>
       <h2>Average Frame size:  {averageFrameBytes.toFixed(2)} KB </h2>
-      <h2>Total Frames: {frameCount}</h2>
       <pre>{frameData.join(' ')}</pre>
     </div>
   );
