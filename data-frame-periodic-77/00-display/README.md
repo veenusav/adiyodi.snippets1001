@@ -48,9 +48,10 @@ Average Frame size: 150.00 KB<br>
 
 #### Explanation
 
-`Frame: 2135` - 2135th frame has been displayed on that moment. 
+`Frame: 2135` - 2135<sup>th</sup> frame has been displayed on that moment.
+
 `Data production FPS: 33` - data production planned, the timer, is for 33 FPS, if you watch the browser conole at the intial loading time, you can see the calculation and more information. let me paste here for reference:
-##### console.log - loadtime
+##### browser's console.log - loading time
 ``` 
 datom size:  8<br>
 DATA_PRODUCTION_FPS:  33
