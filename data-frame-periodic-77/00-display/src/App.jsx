@@ -1,16 +1,13 @@
 const DATA_PRODUCTION_FPS = 33;
 const FRAME_SIZE_IN_KB = 150;
 const NO_OF_FRAMES = 700;
-
+const DISPLAY_SLICE = 5; // ensure enough numbers in the frame. DISPLAY_SLICE * sizeof(number) < FRAME_SIZE_IN_KB*1024
 import React, { useState, useEffect, useRef } from 'react';
 import sizeof from 'object-sizeof';
 
 const SIZE_OF_DATOM = sizeof(Math.floor(Math.random() * 65536));//in bytes
 console.log("datom size: ", SIZE_OF_DATOM);
 const NO_ELEMENTS_FOR_FRAME = (FRAME_SIZE_IN_KB*1024)/SIZE_OF_DATOM;
-
-
-// APPROXIMATE_FRAME_SIZE_IN_KB*1024/SIZE_OF_INTEGER
 
 function populateFrameData(n) {
   const frame = [];
@@ -42,6 +39,7 @@ function populateFramesData(numberOfFrames, elementsCountForEachFrame) {
 const FRAMES = populateFramesData(NO_OF_FRAMES,NO_ELEMENTS_FOR_FRAME);
 
 //--- initialization done
+
 console.log("DATA_PRODUCTION_FPS: ",DATA_PRODUCTION_FPS);
 const DATA_PUBLISH_INTERVAL = 1000/DATA_PRODUCTION_FPS; // milliseconds
 console.log("DATA_PUBLISH_INTERVAL: ", DATA_PUBLISH_INTERVAL," ms");
@@ -50,6 +48,7 @@ const f00Bytes = sizeof(FRAMES[0][0]);
 console.log("dataframe[0][0] has a memory footprint of ", f00Bytes," bytes");
 const f0Bytes = f00Bytes*f0Len; // when if call sizeof(FRAMES[0]) it is giving a lesser figure which i cannot trust. for example for 100 elements 573bytes instead of 800 bytes!
 console.log("dataframe[0] has ",f0Len," elements. Has a memory footprint of ", f0Bytes," bytes (",f0Bytes/1024,"KB)." );
+
 //--- initial logs done
 
 function App() {
@@ -83,7 +82,7 @@ function App() {
       setAverageFps(newAverageFps);
       setAverageFrameBytes(newAverageFrameBytes);
       
-      setFrameData(frame.slice(0, 5)); // Show only a few numbers
+      setFrameData(frame.slice(0, DISPLAY_SLICE)); // Show only a few numbers
       setFrameCount(frameCount + 1); // Increment frame count
     };
 
@@ -106,61 +105,3 @@ function App() {
 }
 
 export default App;
-
-// import React, { useState, useEffect, useRef } from 'react';
-
-// const FPS_INTERVAL = 1000; // milliseconds
-
-// const FRAMES = [
-//   // Replace with your actual 750 frames of data (64x512 numbers)
-//   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-//   [11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
-//   // ... add more frames here
-// ];
-
-// function App() {
-//   const [currentFrame, setCurrentFrame] = useState(0);
-//   const [frameData, setFrameData] = useState([]);
-//   const [fps, setFps] = useState(0);
-//   const previousTimeRef = useRef(0);
-
-//   useEffect(() => {
-//     const handleFrameChange = () => {
-//       const now = performance.now();
-//       const elapsedTime = now - previousTimeRef.current;
-//       previousTimeRef.current = now;
-
-//       // Update FPS
-//       setFps(Math.round(1000 / elapsedTime));
-
-//       // Update current frame
-//       setCurrentFrame((prevFrame) => (prevFrame + 1));
-//     };
-
-//     const intervalId = setInterval(handleFrameChange, 30);
-
-//     return () => clearInterval(intervalId);
-//   }, []);
-
-//   // Update data based on currentFrame
-//   useEffect(() => {
-//     setFrameData(FRAMES[currentFrame % FRAMES.length].slice(0, 10));// Show only a few numbers
-//   }, [currentFrame]);
-
-//   return (
-//     <div className="App">
-//       <h1>Frame Viewer</h1>
-//       <h2>Frame: {currentFrame + 1}</h2>
-//       <h2>FPS: {fps}</h2>
-//       <pre>{frameData.join(' ')}</pre>
-//     </div>
-//   );
-// }
-
-// export default App;
-
-
-
-
-
-

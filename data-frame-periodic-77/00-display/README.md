@@ -20,8 +20,9 @@ The program uses node/vite and at the client side react.
 This standalone code which has the following major constants in the code.
 
 
-```
-//app.jsx
+```js
+// app.jsx
+
 const DATA_PRODUCTION_FPS = 33;
 const FRAME_SIZE_IN_KB = 150;
 const NO_OF_FRAMES = 700;
