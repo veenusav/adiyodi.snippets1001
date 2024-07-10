@@ -49,7 +49,9 @@ Average Frame size: 150.00 KB<br>
 
 `Frame: 2135` - 2135th frame has been displayed on that moment. 
 `Data production FPS: 33` - data production planned, the timer, is for 33 FPS, if you watch the browser conole at the intial loading time, you can see the calculation and more information. let me paste here for reference:
-```datom size:  8<br>
+##### console.log - loadtime
+``` 
+datom size:  8<br>
 DATA_PRODUCTION_FPS:  33
 DATA_PUBLISH_INTERVAL:  30.303030303030305  ms
 dataframe[0][0] has a memory footprint of  8  bytes
