@@ -93,6 +93,7 @@ function App() {
 
   return (
     <div className="App">
+      <h3>00-display</h3>
       <h1>Frame Viewer</h1>
       <h2>Frame: {frameCount}</h2>
       <h2>Data production FPS: {DATA_PRODUCTION_FPS}</h2>

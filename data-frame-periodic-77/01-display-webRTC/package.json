@@ -1,0 +1,19 @@
+{
+  "name": "webrtc_veenus",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "mkcert": "^1.5.1",
+    "object-sizeof": "^2.6.4",
+    "socket.io": "^4.6.2"
+  },
+  "description": ""
+}
