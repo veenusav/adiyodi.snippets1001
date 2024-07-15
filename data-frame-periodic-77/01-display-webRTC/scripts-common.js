@@ -486,17 +486,71 @@ initProducer = () => {
         enableUI("call");
         disableUI("hangup");
     }   
+
+    //-- initializes constant values on UI
+    document.getElementById("user-name").innerHTML = userName;
+    document.getElementById("targetted_fps").innerHTML = DATA_PRODUCTION_FPS;
+    
     //--hooks on UI
-    document.querySelector('#user-name').innerHTML = userName;
     document.querySelector('#call').addEventListener('click', call);
     document.querySelector('#hangup').addEventListener('click', hangup);
 
     //------ Data production side ----- 
+    let frameCount=0;
+    let lastFrameTimestamp = performance.now();
+    let averageFps=0;
+    let AVGUIUpdatedTimestamp = performance.now();
     function updateLocalText() {
+        document.getElementById("frameID").innerHTML = frameCount;
+        
+        //-- fps calculation
+        const now = performance.now();
+        const elapsedTime = now - lastFrameTimestamp;
+  
+        // Update FPS
+        const currentFps = Math.round(1000 / elapsedTime);
+  
+        // Update average FPS
+        averageFps = (averageFps * frameCount + currentFps) / (frameCount + 1);
+        
+        document.getElementById("current_fps").innerHTML = currentFps;
+        if(now - AVGUIUpdatedTimestamp > 2000) {
+            document.getElementById("average_fps").innerHTML = averageFps.toFixed(2);// Math.round(averageFps);
+            AVGUIUpdatedTimestamp = now;
+        }
+        lastFrameTimestamp=now;
+
+        //--- gathering new data
+        //todo: now assigning some junk lengthy data
+        someData = JSON.stringify({
+            "glossary": {
+                "title": "example glossary",
+                "GlossDiv": {
+                    "title": "S",
+                    "GlossList": {
+                        "GlossEntry": {
+                            "ID": "SGML",
+                            "SortAs": "SGML",
+                            "GlossTerm": "Standard Generalized Markup Language",
+                            "Acronym": "SGML",
+                            "Abbrev": "ISO 8879:1986",
+                            "GlossDef": {
+                                "para": "A meta-markup language, used to create markup languages such as DocBook.",
+                                "GlossSeeAlso": ["GML", "XML"]
+                            },
+                            "GlossSee": "markup"
+                        }
+                    }
+                }
+            }
+        },null, 2 );
         const randomValue = Math.floor(Math.random() * 100000);
-        const localMessage = userName + " | " + randomValue;
-        document.querySelector('#local-text').innerHTML = localMessage;
-        sendText(localMessage); //create data channel and send text. also receive
+        const dataFrame = userName + " | " + randomValue +"\n" +someData; 
+        document.getElementById("dataFrame").innerHTML = dataFrame.slice(0,300);
+        sendText(dataFrame); //create data channel and send text. also receive
+        document.getElementById("current_frame_size").innerHTML = (dataFrame.length /1024).toFixed(4) + "kb";
+
+        frameCount++;
     }
 
     setInterval(updateLocalText, DATA_PUBLISH_INTERVAL); // update local text periodically 
@@ -520,7 +574,8 @@ initConsumer = () => {
         offers.forEach(o=>{//make green answer button for all the offers available
             console.log(o);
             const newOfferEl = document.createElement('div');
-            newOfferEl.innerHTML = `<button class="btn btn-success col-1">Answer ${o.offererUserName}</button>`
+            // btn-success class gives a green color
+            newOfferEl.innerHTML = `<button class="btn btn-success col-1">Answer ${o.offererUserName}</button>` 
             newOfferEl.addEventListener('click',()=>answerOffer(o))
             answerEl.appendChild(newOfferEl);
         })
@@ -537,9 +592,10 @@ initConsumer = () => {
         console.log("webrtc_onConnectionStopped() ");
         disableUI("hangup");
     }    
-    webrtc_onMessage = (message) => {
-        document.querySelector('#remote-text').innerHTML = message;
-        document.querySelector('#frameCount').innerHTML = message;
+    webrtc_onMessage = (dataFrame) => {
+        document.querySelector('#frameID').innerHTML = dataFrame.slice(0,10);
+        document.getElementById("dataFrame").innerHTML = dataFrame.slice(0,300);
+        
     };
     //--hooks on UI
     document.querySelector('#user-name').innerHTML = userName;

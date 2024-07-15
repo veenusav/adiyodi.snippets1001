@@ -1,18 +1,10 @@
-#data-container{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2em;
-    position: relative;
+.data-container{
+    background-color:rgb(248 244 244);
+}
+.data-sample {
+    background-color:#d1cad7;
 }
 
-.video-player{
-    background-color: black;
-    width: 100%;
-}
-
-#video-wrapper{
-    position: relative;
-}
 
 #waiting{
     display: none;
@@ -29,4 +21,11 @@
 
 #answer{
     
+}
+.boxx {
+  border: 3px solid #9a9f93;
+  padding: 15px;
+}
+.emphasiss {
+background-color: #f9f90a38;
 }

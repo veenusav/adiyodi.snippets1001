@@ -1,41 +1,51 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
     <title>The-Producer</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <link rel='stylesheet' type='text/css' media='screen' href='styles.css'>
 </head>
+
 <body>
-    <div class="container">
-        <div class="row mb-3 mt-3 justify-content-md-center">
-            <div id="user-name"></div>
-            <button id="call" class="btn btn-primary col-1">Call!</button>
-            <button id="hangup" class="col-1" class="btn btn-primary">Hangup</button>
-            <!-- <div id="answer" class="col"></div> -->
-        </div>
-        <div id="data-container">
-            <div id="video-wrapper">
-                <div id="waiting" class="btn btn-warning">Waiting for answer...</div>
-                <label id="local-text">local-text-default</label>
+    <div class="row">
+        <div class="col-md-8 offset-md-2 boxx">
+            <div>
+                <h1>Data Frame Producer</h1>
+                <div class="row mb-3 mt-3 justify-content-md-center">
+                    <div id="user-name"></div>
+                    <div>
+                        <button id="call" class="btn btn-primary">Connect</button>
+                        <button id="hangup" class="btn">Hangup</button>
+                    </div>
+                </div>
+
             </div>
-            <label id="remote-text">remote-text-default</label>
+            <div class="fs-3" >Data production status</div>
+            <div class="d-flex">
+                <div class="container">
+                    <div>Frame: <label id="frameID" /> </div>
+                    <div>Data Production Frames Statistics</div>
+                    <div>Targetted FPS: <label id="targetted_fps" /></div>
+                    <div>Latest/Current FPS: <label id="current_fps" /></div>
+                    <div>Latest/Frame Size: <label id="current_frame_size" /></div>
+                </div>
+                <div>
+                    <div class="container">Average FPS: <label id="average_fps" class="fs-1 emphasiss" /></div>
+                </div>
+            </div>
+            <div class="fs-3">Frame sample</div>
+            <pre><label id="dataFrame" class="d-flex data-sample"/></pre>
+            <h5>code:adiyodi/01-display-webRTC</h5>
         </div>
     </div>
-    <div class="App">
-        <h3>01-display-webRTC</h3>
-        <h1>Frame Viewer</h1>
-        <h2>Frame: <label id="frameCount"/> </h2>
-        <h2>Data production FPS: <label id="DATA_PRODUCTION_FPS"/></h2>
-        <h2>Current         FPS: <label id="fps"/></h2>
-        <h2>Average         FPS: <label id="averageFps"/></h2>
-        <h2>Average Frame size:  <label id="averageFrameBytes"/> KB </h2>
-        <pre><label id="frameDataSample"/></pre>
-      </div>    
 </body>
 <script src="/socket.io/socket.io.js"></script>
 <script src='scripts-common.js'></script>
 <script> initProducer(); </script>
+
 </html>
