@@ -93,7 +93,7 @@ const socket = io.connect(WEB_SERVER_URL, {
 
 //onGettingOffers(offers)
 //when we receive offers
-let onGettingOffers; 
+let onGettingOffers;
 
 //onAnswerResponse(offers)
 //when the peer accepted our offer (aka answer)
@@ -104,30 +104,30 @@ let onAnswerResponse;
 let onReceivedIceCandidates;
 
 //on connection to signaling serve we get all available offers 
-socket.on('availableOffers',offers=>{
-    
+socket.on('availableOffers', offers => {
+
     console.log(offers)
-    if(onGettingOffers!=undefined)
+    if (onGettingOffers != undefined)
         onGettingOffers(offers);
 })
 
 //someone made a new offer and we're already here
-socket.on('newOfferAwaiting',offers=>{
+socket.on('newOfferAwaiting', offers => {
     console.log(offers)
-    if(onGettingOffers!=undefined)
+    if (onGettingOffers != undefined)
         onGettingOffers(offers);
 })
 
 //someone accepted our offer
-socket.on('answerResponse',offerObj=>{
+socket.on('answerResponse', offerObj => {
     console.log(offerObj)
 
-    if(onAnswerResponse!=undefined)
-        onAnswerResponse(offerObj);    
+    if (onAnswerResponse != undefined)
+        onAnswerResponse(offerObj);
 })
 
-socket.on('receivedIceCandidateFromServer',iceCandidate=>{
-    if(onReceivedIceCandidates!=undefined)
+socket.on('receivedIceCandidateFromServer', iceCandidate => {
+    if (onReceivedIceCandidates != undefined)
         onReceivedIceCandidates(iceCandidate)
 })
 
@@ -249,9 +249,9 @@ const createPeerConnection = (offerObj) => {
             dataChannel.addEventListener("open", () => {
                 console.log("Data channel opened!");
 
-                if(webrtc_onConnectionStarted!=undefined)
+                if (webrtc_onConnectionStarted != undefined)
                     webrtc_onConnectionStarted();
-            
+
                 // dataChannel.addEventListener("message", (event) => {
                 //     console.log("DData channel Received text message:", event.data);
                 //     // Update UI or handle message content here
@@ -261,7 +261,7 @@ const createPeerConnection = (offerObj) => {
 
                 console.log(' Data channel closed', event);
 
-                if(webrtc_onConnectionStopped!=undefined)
+                if (webrtc_onConnectionStopped != undefined)
                     webrtc_onConnectionStopped();
 
                 if (peerConnection === undefined && dataChannel === undefined) {
@@ -365,14 +365,14 @@ const call = async e => {
             // console.log(peerConnection.signalingState)
 
             //'Call' answered and connection established.
-            if(webrtc_onOfferAnswered!=undefined)
+            if (webrtc_onOfferAnswered != undefined)
                 webrtc_onOfferAnswered();
 
-        }        
+        }
         socket.emit('newOffer', offer); //send offer to signalingServer
-        if(webrtc_onOfferGenerated!=undefined)
+        if (webrtc_onOfferGenerated != undefined)
             webrtc_onOfferGenerated();
-        
+
         // //======================== VEENUS ADDITION FOR AVOIDING STUN ====== BEGIN
         // const candidateDefault = '930039970 1 udp 2122260223 192.168.229.179 62809 typ host generation 0 ufrag 1+5w network-id 1'
         // console.log(".vav. sending default ICE Candidate. BEGIN ");
@@ -444,18 +444,18 @@ const answerOffer = async (offerObj) => {
     })
     console.log(offerIceCandidates)
 }
-
+const AVG_FPS_UI_UPDATE_INERVAL = 2000; //in milliseconds.
 //===  utility functions
-enableUI=(id)=> {
+enableUI = (id) => {
     const e = document.getElementById(id);
-    if(e===null)
+    if (e === null)
         return false;
     e.disabled = false;
     return true;
 }
-disableUI=(id) =>{
+disableUI = (id) => {
     const e = document.getElementById(id);
-    if(e===null)
+    if (e === null)
         return false;
     e.disabled = true;
     return true;
@@ -469,6 +469,12 @@ initProducer = () => {
     disableUI("hangup");
 
     //--hook on internal states
+    let frameCount = 0;
+    let firstFrameTimestamp = performance.now();
+    let lastFrameTimestamp = performance.now();
+    let averageFps = 0;
+    let AVGUIUpdatedTimestamp = performance.now();
+
     webrtc_onOfferGenerated = () => {
         console.log("webrtc_onOfferGenerated() ");
 
@@ -480,45 +486,65 @@ initProducer = () => {
         console.log("webrtc_onConnectionStarted() ");
         enableUI("hangup");
         disableUI("call");
+
+        //initing all counters for FPS calc - connection is a fresh start
+        frameCount = 0;
+        lastFrameTimestamp = performance.now();
+        averageFps = 0;
+        AVGUIUpdatedTimestamp = performance.now();
+
+        console.log("resetting FPS calculation... begin")
+        frameCount = 0;
+        const now = performance.now();
+        firstFrameTimestamp = now;
+        lastFrameTimestamp = now;
+        averageFps = 0;
+        AVGUIUpdatedTimestamp = now;
+        console.log("Resetting FPS calculation... end");
+        // console.log("averageFps, frameCount+1, firstFrameTimestamp,now, (now - firstFrameTimestamp), (now - firstFrameTimestamp)/(frameCount + 1)");
+        // console.log(averageFps, frameCount + 1, firstFrameTimestamp, now, (now - firstFrameTimestamp), (now - firstFrameTimestamp) / (frameCount + 1));
+
+
     }
     webrtc_onConnectionStopped = () => {
         console.log("webrtc_onConnectionStopped() ");
         enableUI("call");
         disableUI("hangup");
-    }   
+    }
 
     //-- initializes constant values on UI
     document.getElementById("user-name").innerHTML = userName;
     document.getElementById("targetted_fps").innerHTML = DATA_PRODUCTION_FPS;
-    
+
     //--hooks on UI
     document.querySelector('#call').addEventListener('click', call);
     document.querySelector('#hangup').addEventListener('click', hangup);
 
     //------ Data production side ----- 
-    let frameCount=0;
-    let lastFrameTimestamp = performance.now();
-    let averageFps=0;
-    let AVGUIUpdatedTimestamp = performance.now();
-    function updateLocalText() {
+
+    function produceData() {
         document.getElementById("frameID").innerHTML = frameCount;
-        
+
         //-- fps calculation
         const now = performance.now();
         const elapsedTime = now - lastFrameTimestamp;
-  
+
         // Update FPS
         const currentFps = Math.round(1000 / elapsedTime);
-  
+
         // Update average FPS
-        averageFps = (averageFps * frameCount + currentFps) / (frameCount + 1);
-        
+        // averageFps = (averageFps * frameCount + currentFps) / (frameCount + 1);
+        averageFps = 1000 / ((now - firstFrameTimestamp) / (frameCount + 1));
+
+        // if (frameCount % 400 === 0) {
+        //     console.log(averageFps, ", ", frameCount + 1, ", ", firstFrameTimestamp, ", ", now, ", ", (now - firstFrameTimestamp), ", ", (now - firstFrameTimestamp) / (frameCount + 1));
+        // }
         document.getElementById("current_fps").innerHTML = currentFps;
-        if(now - AVGUIUpdatedTimestamp > 2000) {
+        if (now - AVGUIUpdatedTimestamp > AVG_FPS_UI_UPDATE_INERVAL) {
             document.getElementById("average_fps").innerHTML = averageFps.toFixed(2);// Math.round(averageFps);
             AVGUIUpdatedTimestamp = now;
         }
-        lastFrameTimestamp=now;
+        lastFrameTimestamp = now;
 
         //--- gathering new data
         //todo: now assigning some junk lengthy data
@@ -543,59 +569,104 @@ initProducer = () => {
                     }
                 }
             }
-        },null, 2 );
+        }, null, 2);
         const randomValue = Math.floor(Math.random() * 100000);
-        const dataFrame = userName + " | " + randomValue +"\n" +someData; 
-        document.getElementById("dataFrame").innerHTML = dataFrame.slice(0,300);
+        const dataFrame = userName + " | " + randomValue + "\n" + someData;
+        document.getElementById("dataFrame").innerHTML = dataFrame.slice(0, 300);
         sendText(dataFrame); //create data channel and send text. also receive
-        document.getElementById("current_frame_size").innerHTML = (dataFrame.length /1024).toFixed(4) + "kb";
+        document.getElementById("current_frame_size").innerHTML = (dataFrame.length / 1024).toFixed(4) + "kb";
 
         frameCount++;
     }
-
-    setInterval(updateLocalText, DATA_PUBLISH_INTERVAL); // update local text periodically 
+    console.log("Data production interval ", DATA_PUBLISH_INTERVAL, " ms");
+    setInterval(produceData, DATA_PUBLISH_INTERVAL); // update local text periodically 
 }
 
 //=== consumer side functions
 
 initConsumer = () => {
     onGettingOffers = (offers) => {
-    
+
         const answerEl = document.querySelector('#answer');
-        if(answerEl===null) {
-            console.log("Producer/Publisher only - Discarding offers...");
+        if (answerEl === null) {
+            console.error("Not configured as a Cosumer. - Discarding WebRTC offers received...");
             return;
         }
-        
+
         while (answerEl.firstChild) { //remove all the existing answer buttons.
             answerEl.removeChild(answerEl.firstChild);
         }
-    
-        offers.forEach(o=>{//make green answer button for all the offers available
+
+        offers.forEach(o => {//make green answer button for all the offers available
             console.log(o);
             const newOfferEl = document.createElement('div');
             // btn-success class gives a green color
-            newOfferEl.innerHTML = `<button class="btn btn-success col-1">Answer ${o.offererUserName}</button>` 
-            newOfferEl.addEventListener('click',()=>answerOffer(o))
+            newOfferEl.innerHTML = `<button class="btn btn-success col-1">Answer ${o.offererUserName}</button>`
+            newOfferEl.addEventListener('click', () => answerOffer(o))
             answerEl.appendChild(newOfferEl);
         })
-    };    
+    };
     //-- init states and buttons/controls
     disableUI("hangup");
-    
+
     //--hook on internal states
+
+    let frameCount = 0;
+    let firstFrameTimestamp = performance.now();
+    let lastFrameTimestamp = performance.now();
+    let averageFps = 0;
+    let AVGUIUpdatedTimestamp = performance.now();
     webrtc_onConnectionStarted = () => {
         console.log("webrtc_onConnectionStarted() ");
         enableUI("hangup");
+        const answerEl = document.querySelector('#answer');
+        while (answerEl.firstChild) { //remove all the existing answer buttons.
+            answerEl.removeChild(answerEl.firstChild);
+        }
+        //initing all counters for FPS calc. connection is a fresh start
+        console.log("resetting FPS calculation... begin")
+        frameCount = 0;
+        const now = performance.now();
+        firstFrameTimestamp = now;
+        lastFrameTimestamp = now;
+        averageFps = 0;
+        AVGUIUpdatedTimestamp = now;
+        console.log("Resetting FPS calculation... end");
+        // console.log("averageFps, frameCount+1, firstFrameTimestamp,now, (now - firstFrameTimestamp), (now - firstFrameTimestamp)/(frameCount + 1)");
+        // console.log(averageFps, frameCount + 1, firstFrameTimestamp, now, (now - firstFrameTimestamp), (now - firstFrameTimestamp) / (frameCount + 1));
     }
     webrtc_onConnectionStopped = () => {
         console.log("webrtc_onConnectionStopped() ");
         disableUI("hangup");
-    }    
+        document.getElementById("average_fps").innerHTML = "--.--";
+        document.getElementById("current_fps").innerHTML = "-";
+    }
+    //------ Data display side ----- 
     webrtc_onMessage = (dataFrame) => {
-        document.querySelector('#frameID').innerHTML = dataFrame.slice(0,10);
-        document.getElementById("dataFrame").innerHTML = dataFrame.slice(0,300);
-        
+        //-- fps calculation
+        const now = performance.now();
+        const elapsedTime = now - lastFrameTimestamp;
+
+        // Update FPS
+        const currentFps = Math.round(1000 / elapsedTime);
+
+        // Update average FPS
+        //averageFps = (averageFps * frameCount + currentFps) / (frameCount + 1);
+        averageFps = 1000 / ((now - firstFrameTimestamp) / (frameCount + 1));
+        // if (frameCount % 400 === 0) {
+        //     console.log(averageFps, ", ", frameCount + 1, ", ", firstFrameTimestamp, ", ", now, ", ", (now - firstFrameTimestamp), ", ", (now - firstFrameTimestamp) / (frameCount + 1));
+        // }
+        document.getElementById("current_fps").innerHTML = currentFps;
+        if (now - AVGUIUpdatedTimestamp > AVG_FPS_UI_UPDATE_INERVAL) {
+            document.getElementById("average_fps").innerHTML = averageFps.toFixed(2);// Math.round(averageFps);
+            AVGUIUpdatedTimestamp = now;
+        }
+        lastFrameTimestamp = now;
+        document.getElementById("current_frame_size").innerHTML = (dataFrame.length / 1024).toFixed(4) + "kb";
+
+        document.getElementById("frameCount").innerHTML = frameCount;
+        document.getElementById("dataFrame").innerHTML = dataFrame.slice(0, 300);
+        frameCount++;
     };
     //--hooks on UI
     document.querySelector('#user-name').innerHTML = userName;
