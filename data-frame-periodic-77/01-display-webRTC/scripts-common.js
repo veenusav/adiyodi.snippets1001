@@ -5,56 +5,10 @@ const DISPLAY_SLICE = 100; //characters // ensure enough numbers in the frame. D
 const AVG_FPS_UI_UPDATE_INERVAL = 2000; //in milliseconds.
 
 const SIZE_OF_CHARACTER=2; // in bytes
-// //import React, { useState, useEffect, useRef } from 'react';
-// import {sizeof} from 'object-sizeof';
 
-// const SIZE_OF_DATOM = sizeof(Math.floor(Math.random() * 65536));//in bytes
-// console.log("datom size: ", SIZE_OF_DATOM);
-// const NO_ELEMENTS_FOR_FRAME = (FRAME_SIZE_IN_KB*1024)/SIZE_OF_DATOM;
-
-// function populateFrameData(n) {
-//   const frame = [];
-//   for (let i = 0; i < n; i++) {
-//     // Generate a random integer between 0 (inclusive) and 65535 (inclusive)
-//     const randomNumber = Math.floor(Math.random() * 65536);
-//     frame.push(randomNumber);
-//   }
-//   return frame;
-// }
-
-// function populateFramesData(numberOfFrames, elementsCountForEachFrame) {
-//   // Check for invalid input (n should be a positive integer)
-//   if (numberOfFrames <= 0 || !Number.isInteger(numberOfFrames)) {
-//     throw new Error('Invalid input: numberOfFrames must be a positive integer');
-//   }
-//   // Check for invalid input (n should be a positive integer)
-//   if (elementsCountForEachFrame <= 0 || !Number.isInteger(elementsCountForEachFrame)) {
-//     throw new Error('Invalid input: elementsCountForEachFrame must be a positive integer');
-//   }
-//   const frames = [];
-//   for (let i = 0; i < numberOfFrames; i++) {
-//     const frame=populateFrameData(elementsCountForEachFrame);
-//     frames.push(frame);
-//   }
-//   return frames;
-// }
-
-// const FRAMES = populateFramesData(NO_OF_FRAMES,NO_ELEMENTS_FOR_FRAME);
-
-// //--- initialization done
-
-// console.log("DATA_PRODUCTION_FPS: ",DATA_PRODUCTION_FPS);
 const DATA_PUBLISH_INTERVAL = 1000 / DATA_PRODUCTION_FPS; // milliseconds
-// console.log("DATA_PUBLISH_INTERVAL: ", DATA_PUBLISH_INTERVAL," ms");
-// const f0Len = FRAMES[0].length;
-// const f00Bytes = sizeof(FRAMES[0][0]);
-// console.log("dataframe[0][0] has a memory footprint of ", f00Bytes," bytes");
-// const f0Bytes = f00Bytes*f0Len; // when if call sizeof(FRAMES[0]) it is giving a lesser figure which i cannot trust. for example for 100 elements 573bytes instead of 800 bytes!
-// console.log("dataframe[0] has ",f0Len," elements. Has a memory footprint of ", f0Bytes," bytes (",f0Bytes/1024,"KB)." );
 
-// //--- initial logs done
-
-//Web server related configuration
+//Signal server related configuration
 const WEB_SERVER_URL = 'https://localhost:8181/'; // Caution: Obviously! it is used in server as well!
 //const WEB_SERVER_URL = 'https://LOCAL-DEV-IP-HERE:8181/'; //if trying it on a phone, use this instead...
 
