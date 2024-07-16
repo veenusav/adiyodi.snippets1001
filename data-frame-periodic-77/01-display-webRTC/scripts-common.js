@@ -1,7 +1,10 @@
-const DATA_PRODUCTION_FPS = 33;
+const DATA_PRODUCTION_FPS = 60;
 const FRAME_SIZE_IN_KB = 150;
-const NO_OF_FRAMES = 700;
-const DISPLAY_SLICE = 5; // ensure enough numbers in the frame. DISPLAY_SLICE * sizeof(number) < FRAME_SIZE_IN_KB*1024
+const NO_OF_FRAMES = 2;
+const DISPLAY_SLICE = 100; //characters // ensure enough numbers in the frame. DISPLAY_SLICE * sizeof(number) < FRAME_SIZE_IN_KB*1024
+const AVG_FPS_UI_UPDATE_INERVAL = 2000; //in milliseconds.
+
+const SIZE_OF_CHARACTER=2; // in bytes
 // //import React, { useState, useEffect, useRef } from 'react';
 // import {sizeof} from 'object-sizeof';
 
@@ -444,7 +447,7 @@ const answerOffer = async (offerObj) => {
     })
     console.log(offerIceCandidates)
 }
-const AVG_FPS_UI_UPDATE_INERVAL = 2000; //in milliseconds.
+
 //===  utility functions
 enableUI = (id) => {
     const e = document.getElementById(id);
@@ -463,6 +466,54 @@ disableUI = (id) => {
 
 //=== producer side functions
 initProducer = () => {
+    //--- let us disable controlls while we populate data
+    disableUI("call");
+    disableUI("hangup");
+    //------
+    const SIZE_OF_DATOM = SIZE_OF_CHARACTER;//in bytes
+    console.log("datom size: ", SIZE_OF_DATOM);
+    const NO_ELEMENTS_FOR_FRAME = (FRAME_SIZE_IN_KB*1024)/SIZE_OF_DATOM;
+    
+    function populateFrameData(n) {
+      const frame = [];
+      for (let i = 0; i < n; i++) {
+        frame.push('=');
+      }
+      return frame;
+    }
+    
+    function populateFramesData(numberOfFrames, elementsCountForEachFrame) {
+      // Check for invalid input (n should be a positive integer)
+      if (numberOfFrames <= 0 || !Number.isInteger(numberOfFrames)) {
+        throw new Error('Invalid input: numberOfFrames must be a positive integer');
+      }
+      // Check for invalid input (n should be a positive integer)
+      if (elementsCountForEachFrame <= 0 || !Number.isInteger(elementsCountForEachFrame)) {
+        throw new Error('Invalid input: elementsCountForEachFrame must be a positive integer');
+      }
+      const frames = [];
+      for (let i = 0; i < numberOfFrames; i++) {
+        const frame=populateFrameData(elementsCountForEachFrame);
+        frames.push(frame);
+      }
+      return frames;
+    }
+    
+    const FRAMES = populateFramesData(NO_OF_FRAMES,NO_ELEMENTS_FOR_FRAME);
+    
+    //--- initialization done
+    
+    console.log("DATA_PRODUCTION_FPS: ",DATA_PRODUCTION_FPS);
+    const DATA_PUBLISH_INTERVAL = 1000/DATA_PRODUCTION_FPS; // milliseconds
+    console.log("DATA_PUBLISH_INTERVAL: ", DATA_PUBLISH_INTERVAL," ms");
+    const f0Len = FRAMES[0].length;
+    const f00Bytes = SIZE_OF_CHARACTER;//sizeof(FRAMES[0][0]);
+    console.log("dataframe[0][0] has a memory footprint of ", f00Bytes," bytes");
+    const f0Bytes = f00Bytes*f0Len; // when if call sizeof(FRAMES[0]) it is giving a lesser figure which i cannot trust. for example for 100 elements 573bytes instead of 800 bytes!
+    console.log("dataframe[0] has ",f0Len," elements. Has a memory footprint of ", f0Bytes," bytes (",f0Bytes/1024,"KB)." );
+    
+    //--- initial logs done
+    
 
     //-- init states and buttons/controls
     enableUI("call");
@@ -548,31 +599,32 @@ initProducer = () => {
 
         //--- gathering new data
         //todo: now assigning some junk lengthy data
-        someData = JSON.stringify({
-            "glossary": {
-                "title": "example glossary",
-                "GlossDiv": {
-                    "title": "S",
-                    "GlossList": {
-                        "GlossEntry": {
-                            "ID": "SGML",
-                            "SortAs": "SGML",
-                            "GlossTerm": "Standard Generalized Markup Language",
-                            "Acronym": "SGML",
-                            "Abbrev": "ISO 8879:1986",
-                            "GlossDef": {
-                                "para": "A meta-markup language, used to create markup languages such as DocBook.",
-                                "GlossSeeAlso": ["GML", "XML"]
-                            },
-                            "GlossSee": "markup"
-                        }
-                    }
-                }
-            }
-        }, null, 2);
+        // someData = JSON.stringify({
+        //     "glossary": {
+        //         "title": "example glossary",
+        //         "GlossDiv": {
+        //             "title": "S",
+        //             "GlossList": {
+        //                 "GlossEntry": {
+        //                     "ID": "SGML",
+        //                     "SortAs": "SGML",
+        //                     "GlossTerm": "Standard Generalized Markup Language",
+        //                     "Acronym": "SGML",
+        //                     "Abbrev": "ISO 8879:1986",
+        //                     "GlossDef": {
+        //                         "para": "A meta-markup language, used to create markup languages such as DocBook.",
+        //                         "GlossSeeAlso": ["GML", "XML"]
+        //                     },
+        //                     "GlossSee": "markup"
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }, null, 2);
+        someData = FRAMES[0];
         const randomValue = Math.floor(Math.random() * 100000);
         const dataFrame = userName + " | " + randomValue + "\n" + someData;
-        document.getElementById("dataFrame").innerHTML = dataFrame.slice(0, 300);
+        document.getElementById("dataFrame").innerHTML = dataFrame.slice(0, DISPLAY_SLICE);
         sendText(dataFrame); //create data channel and send text. also receive
         document.getElementById("current_frame_size").innerHTML = (dataFrame.length / 1024).toFixed(4) + "kb";
 
@@ -665,7 +717,7 @@ initConsumer = () => {
         document.getElementById("current_frame_size").innerHTML = (dataFrame.length / 1024).toFixed(4) + "kb";
 
         document.getElementById("frameCount").innerHTML = frameCount;
-        document.getElementById("dataFrame").innerHTML = dataFrame.slice(0, 300);
+        document.getElementById("dataFrame").innerHTML = dataFrame.slice(0, DISPLAY_SLICE);
         frameCount++;
     };
     //--hooks on UI
