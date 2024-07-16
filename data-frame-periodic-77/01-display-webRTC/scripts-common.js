@@ -63,14 +63,14 @@ let onReceivedIceCandidates;
 //on connection to signaling serve we get all available offers 
 socket.on('availableOffers', offers => {
 
-    console.log(offers)
+    // console.log(offers)
     if (onGettingOffers != undefined)
         onGettingOffers(offers);
 })
 
 //someone made a new offer and we're already here
 socket.on('newOfferAwaiting', offers => {
-    console.log(offers)
+    // console.log(offers)
     if (onGettingOffers != undefined)
         onGettingOffers(offers);
 })
@@ -270,21 +270,28 @@ const createPeerConnection = (offerObj) => {
     })
 }
 
-
-function sendText(message) {
-    if (peerConnection === undefined)
-        return;
-    if (dataChannel === undefined)
-        return;
-
-    if (dataChannel.readyState === "open") {
-        dataChannel.send(message);
-        // console.log("data sent: ", message);
-    } else {
-        // console.warn("Data channel is not open, cannot send message:", message);
-    }
+sendText_nothing = (message) => {
+    //dummyFunction
 }
 
+webrtc_sendText = (message) =>{
+
+    //tbd: remove these checks
+    // masking these checks. it should not come here if this is the condition. 
+    // if (peerConnection === undefined)
+    //     return;
+    // if (dataChannel === undefined)
+    //     return;
+
+    // if (dataChannel.readyState === "open") {
+    //     dataChannel.send(message);
+    //     // console.log("data sent: ", message);
+    // } else {
+    //     // console.warn("Data channel is not open, cannot send message:", message);
+    // }
+    dataChannel.send(message);
+}
+sendText = sendText_nothing; // default value
 //==================================================
 //---------- WebRTC producer side functions --------
 //==================================================
@@ -509,10 +516,12 @@ initProducer = () => {
         // console.log("averageFps, frameCount+1, firstFrameTimestamp,now, (now - firstFrameTimestamp), (now - firstFrameTimestamp)/(frameCount + 1)");
         // console.log(averageFps, frameCount + 1, firstFrameTimestamp, now, (now - firstFrameTimestamp), (now - firstFrameTimestamp) / (frameCount + 1));
 
-
+        sendText = webrtc_sendText;
+        
     }
     webrtc_onConnectionStopped = () => {
         console.log("webrtc_onConnectionStopped() ");
+        sendText = sendText_nothing;
         enableUI("call");
         disableUI("hangup");
     }
