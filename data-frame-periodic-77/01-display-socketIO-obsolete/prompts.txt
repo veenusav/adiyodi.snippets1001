@@ -1,0 +1,33 @@
+const WEB_SERVER_PORT = 8182;
+const DATA_SERVER_PORT = 8182;
+
+const DATA_PRODUCTION_FPS = 35;
+const FRAME_SIZE_IN_KB = 150;
+const NO_OF_FRAMES = 2;
+
+const DATA_PUBLISH_INTERVAL = 1000 / DATA_PRODUCTION_FPS; // milliseconds
+
+
+
+
+Make use of the above parameters and create a node.js based code.
+() on app start, prepare a set of random text based dataFrames in an array FRAMES whos size should be NO_OF_FRAMES. 
+Each frame should have certain size(kilo bytes) based on FRAME_SIZE_IN_KB. 
+() file serving app over http. use port WEB_SERVER_PORT
+The code should serve files in the local folder like:
+index-consumer.html scripts-common.js styles.css
+() it should expose  a websocket at DATA_SERVER_PORT.
+() When the client(from html page based js function of browser) request a message "START-STREAMING", the 
+ server program should periodically send frame from FRAMES array. 
+ Each frame's size have been fixed as we already created by considering FRAME_SIZE_IN_KB.
+ after completion of the FRAMES, the index can be reset to zero.
+ DATA_PRODUCTION_FPS is our goal to keep. DATA_PUBLISH_INTERVAL in milliseconds can be the time between each frames.
+ () When the client html's js request with a message "START-STREAMING" or if the client exits from the socket connection, 
+ we need to stop sending. then need to wait for a fresh request message "START-STREAMING".
+
+
+
+ In other words, I am creating a websocket based communication app using node js. 
+
+give me both node js code and client side html, js code.
+
