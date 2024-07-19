@@ -1,10 +1,10 @@
-const DATA_PRODUCTION_FPS = 60;
+const DATA_PRODUCTION_FPS = 85;
 const FRAME_SIZE_IN_KB = 150;
 const NO_OF_FRAMES = 2;
 const DISPLAY_SLICE = 100; //characters // ensure enough numbers in the frame. DISPLAY_SLICE * sizeof(number) < FRAME_SIZE_IN_KB*1024
 const AVG_FPS_UI_UPDATE_INERVAL = 2000; //in milliseconds.
 
-const SIZE_OF_CHARACTER=2; // in bytes
+const SIZE_OF_CHARACTER = 2; // in bytes
 
 const DATA_PUBLISH_INTERVAL = 1000 / DATA_PRODUCTION_FPS; // milliseconds
 
@@ -243,7 +243,23 @@ const createPeerConnection = (offerObj) => {
             console.log("registering ondatachannel callback.");
             peerConnection.ondatachannel = (event) => {
                 const dChannel = event.channel;
+                let totLatency = 0; // in milliseconds
+                let frameCount = 0;
                 dChannel.onmessage = (messageEvent) => {
+                    totLatency += performance.now() - event.timeStamp;
+                    if (frameCount % 200 == 0) {
+                        let avgLatency = totLatency / (frameCount + 1);
+
+                        // Calculate and log one-way latency using performance.now()
+                        const receiveTime = performance.now(); // Get high-resolution timestamp
+
+                        // If the server doesn't include a timestamp in the data frame:
+                        // - Adapt the calculation based on your server's implementation
+                        // - You might need to estimate an ideal sending time on the client-side
+
+                        console.log(`${frameCount} : AVG latency = ${avgLatency} ms`);
+                    }
+                    frameCount++;
                     if (webrtc_onMessage != undefined)
                         webrtc_onMessage(messageEvent.data);
                     else
@@ -274,7 +290,7 @@ sendText_nothing = (message) => {
     //dummyFunction
 }
 
-webrtc_sendText = (message) =>{
+webrtc_sendText = (message) => {
 
     //tbd: remove these checks
     // masking these checks. it should not come here if this is the condition. 
@@ -433,48 +449,48 @@ initProducer = () => {
     //------
     const SIZE_OF_DATOM = SIZE_OF_CHARACTER;//in bytes
     console.log("datom size: ", SIZE_OF_DATOM);
-    const NO_ELEMENTS_FOR_FRAME = (FRAME_SIZE_IN_KB*1024)/SIZE_OF_DATOM;
-    
+    const NO_ELEMENTS_FOR_FRAME = (FRAME_SIZE_IN_KB * 1024) / SIZE_OF_DATOM;
+
     function populateFrameData(n) {
-      const frame = [];
-      for (let i = 0; i < n; i++) {
-        frame.push('=');
-      }
-      return frame;
+        const frame = [];
+        for (let i = 0; i < n; i++) {
+            frame.push('=');
+        }
+        return frame;
     }
-    
+
     function populateFramesData(numberOfFrames, elementsCountForEachFrame) {
-      // Check for invalid input (n should be a positive integer)
-      if (numberOfFrames <= 0 || !Number.isInteger(numberOfFrames)) {
-        throw new Error('Invalid input: numberOfFrames must be a positive integer');
-      }
-      // Check for invalid input (n should be a positive integer)
-      if (elementsCountForEachFrame <= 0 || !Number.isInteger(elementsCountForEachFrame)) {
-        throw new Error('Invalid input: elementsCountForEachFrame must be a positive integer');
-      }
-      const frames = [];
-      for (let i = 0; i < numberOfFrames; i++) {
-        const frame=populateFrameData(elementsCountForEachFrame);
-        frames.push(frame);
-      }
-      return frames;
+        // Check for invalid input (n should be a positive integer)
+        if (numberOfFrames <= 0 || !Number.isInteger(numberOfFrames)) {
+            throw new Error('Invalid input: numberOfFrames must be a positive integer');
+        }
+        // Check for invalid input (n should be a positive integer)
+        if (elementsCountForEachFrame <= 0 || !Number.isInteger(elementsCountForEachFrame)) {
+            throw new Error('Invalid input: elementsCountForEachFrame must be a positive integer');
+        }
+        const frames = [];
+        for (let i = 0; i < numberOfFrames; i++) {
+            const frame = populateFrameData(elementsCountForEachFrame);
+            frames.push(frame);
+        }
+        return frames;
     }
-    
-    const FRAMES = populateFramesData(NO_OF_FRAMES,NO_ELEMENTS_FOR_FRAME);
-    
+
+    const FRAMES = populateFramesData(NO_OF_FRAMES, NO_ELEMENTS_FOR_FRAME);
+
     //--- initialization done
-    
-    console.log("DATA_PRODUCTION_FPS: ",DATA_PRODUCTION_FPS);
-    const DATA_PUBLISH_INTERVAL = 1000/DATA_PRODUCTION_FPS; // milliseconds
-    console.log("DATA_PUBLISH_INTERVAL: ", DATA_PUBLISH_INTERVAL," ms");
+
+    console.log("DATA_PRODUCTION_FPS: ", DATA_PRODUCTION_FPS);
+    const DATA_PUBLISH_INTERVAL = 1000 / DATA_PRODUCTION_FPS; // milliseconds
+    console.log("DATA_PUBLISH_INTERVAL: ", DATA_PUBLISH_INTERVAL, " ms");
     const f0Len = FRAMES[0].length;
     const f00Bytes = SIZE_OF_CHARACTER;//sizeof(FRAMES[0][0]);
-    console.log("dataframe[0][0] has a memory footprint of ", f00Bytes," bytes");
-    const f0Bytes = f00Bytes*f0Len; // when if call sizeof(FRAMES[0]) it is giving a lesser figure which i cannot trust. for example for 100 elements 573bytes instead of 800 bytes!
-    console.log("dataframe[0] has ",f0Len," elements. Has a memory footprint of ", f0Bytes," bytes (",f0Bytes/1024,"KB)." );
-    
+    console.log("dataframe[0][0] has a memory footprint of ", f00Bytes, " bytes");
+    const f0Bytes = f00Bytes * f0Len; // when if call sizeof(FRAMES[0]) it is giving a lesser figure which i cannot trust. for example for 100 elements 573bytes instead of 800 bytes!
+    console.log("dataframe[0] has ", f0Len, " elements. Has a memory footprint of ", f0Bytes, " bytes (", f0Bytes / 1024, "KB).");
+
     //--- initial logs done
-    
+
 
     //-- init states and buttons/controls
     enableUI("call");
@@ -517,7 +533,7 @@ initProducer = () => {
         // console.log(averageFps, frameCount + 1, firstFrameTimestamp, now, (now - firstFrameTimestamp), (now - firstFrameTimestamp) / (frameCount + 1));
 
         sendText = webrtc_sendText;
-        
+
     }
     webrtc_onConnectionStopped = () => {
         console.log("webrtc_onConnectionStopped() ");
@@ -584,7 +600,7 @@ initProducer = () => {
         //         }
         //     }
         // }, null, 2);
-        someData = FRAMES[0];
+        someData = FRAMES[frameCount % NO_OF_FRAMES];
         const randomValue = Math.floor(Math.random() * 100000);
         const dataFrame = userName + " | " + randomValue + "\n" + someData;
         document.getElementById("dataFrame").innerHTML = dataFrame.slice(0, DISPLAY_SLICE);
@@ -624,23 +640,15 @@ initConsumer = () => {
     //-- init states and buttons/controls
     disableUI("hangup");
 
-    //--hook on internal states
-
-    let frameCount = 0;
-    let firstFrameTimestamp = performance.now();
-    let lastFrameTimestamp = performance.now();
-    let averageFps = 0;
-    let AVGUIUpdatedTimestamp = performance.now();
-    webrtc_onConnectionStarted = () => {
-        console.log("webrtc_onConnectionStarted() ");
-        enableUI("hangup");
-        const answerEl = document.querySelector('#answer');
-        while (answerEl.firstChild) { //remove all the existing answer buttons.
-            answerEl.removeChild(answerEl.firstChild);
-        }
+    //variables related to FPS calculation
+    let frameCount;
+    let firstFrameTimestamp ;
+    let lastFrameTimestamp;
+    let averageFps;
+    let AVGUIUpdatedTimestamp;
+    initFPSCalculation = () => {
         //initing all counters for FPS calc. connection is a fresh start
         console.log("resetting FPS calculation... begin")
-        frameCount = 0;
         const now = performance.now();
         firstFrameTimestamp = now;
         lastFrameTimestamp = now;
@@ -649,6 +657,16 @@ initConsumer = () => {
         console.log("Resetting FPS calculation... end");
         // console.log("averageFps, frameCount+1, firstFrameTimestamp,now, (now - firstFrameTimestamp), (now - firstFrameTimestamp)/(frameCount + 1)");
         // console.log(averageFps, frameCount + 1, firstFrameTimestamp, now, (now - firstFrameTimestamp), (now - firstFrameTimestamp) / (frameCount + 1));
+    }
+    //--hook on internal states
+    webrtc_onConnectionStarted = () => {
+        console.log("webrtc_onConnectionStarted() ");
+        enableUI("hangup");
+        const answerEl = document.querySelector('#answer');
+        while (answerEl.firstChild) { //remove all the existing answer buttons.
+            answerEl.removeChild(answerEl.firstChild);
+        }
+        frameCount = 0;
     }
     webrtc_onConnectionStopped = () => {
         console.log("webrtc_onConnectionStopped() ");
@@ -659,24 +677,29 @@ initConsumer = () => {
     //------ Data display side ----- 
     webrtc_onMessage = (dataFrame) => {
         //-- fps calculation
-        const now = performance.now();
-        const elapsedTime = now - lastFrameTimestamp;
+        if (frameCount === 0) {
+            initFPSCalculation();
+        } else {
+            const now = performance.now();
 
-        // Update FPS
-        const currentFps = Math.round(1000 / elapsedTime);
+            const elapsedTime = now - lastFrameTimestamp;
 
-        // Update average FPS
-        //averageFps = (averageFps * frameCount + currentFps) / (frameCount + 1);
-        averageFps = 1000 / ((now - firstFrameTimestamp) / (frameCount + 1));
-        // if (frameCount % 400 === 0) {
-        //     console.log(averageFps, ", ", frameCount + 1, ", ", firstFrameTimestamp, ", ", now, ", ", (now - firstFrameTimestamp), ", ", (now - firstFrameTimestamp) / (frameCount + 1));
-        // }
-        document.getElementById("current_fps").innerHTML = currentFps;
-        if (now - AVGUIUpdatedTimestamp > AVG_FPS_UI_UPDATE_INERVAL) {
-            document.getElementById("average_fps").innerHTML = averageFps.toFixed(2);// Math.round(averageFps);
-            AVGUIUpdatedTimestamp = now;
+            // Update FPS
+            const currentFps = Math.round(1000 / elapsedTime);
+
+            // Update average FPS
+            //averageFps = (averageFps * frameCount + currentFps) / (frameCount + 1);
+            averageFps = 1000 / ((now - firstFrameTimestamp) / (frameCount + 1));
+            // if (frameCount % 400 === 0) {
+            //     console.log(averageFps, ", ", frameCount + 1, ", ", firstFrameTimestamp, ", ", now, ", ", (now - firstFrameTimestamp), ", ", (now - firstFrameTimestamp) / (frameCount + 1));
+            // }
+            document.getElementById("current_fps").innerHTML = currentFps;
+            if (now - AVGUIUpdatedTimestamp > AVG_FPS_UI_UPDATE_INERVAL) {
+                document.getElementById("average_fps").innerHTML = averageFps.toFixed(2);// Math.round(averageFps);
+                AVGUIUpdatedTimestamp = now;
+            }
+            lastFrameTimestamp = now;
         }
-        lastFrameTimestamp = now;
         document.getElementById("current_frame_size").innerHTML = (dataFrame.length / 1024).toFixed(4) + "kb";
 
         document.getElementById("frameCount").innerHTML = frameCount;

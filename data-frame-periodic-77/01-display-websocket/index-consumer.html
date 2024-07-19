@@ -15,12 +15,12 @@
     <div class="row">
         <div class="col-md-8 offset-md-2 boxx">
             <div>
-                <h1>Data Frame Consumer WebRTC </h1>
+                <h1>Data Frame Consumer - Websocket</h1>
                 <div class="row mb-3 mt-3 justify-content-md-center">
                     <div id="user-name"></div>
                     <div>
-                        <button id="hangup" class="col-1" class="btn btn-primary">Hangup</button>
-                        <div id="answer" class="col"></div>
+                        <button id="call" class="btn btn-primary">Start</button>
+                        <button id="hangup" class="btn">Hangup</button>
                     </div>
                 </div>
 
@@ -49,12 +49,11 @@
             </div>
             <div class="fs-3">Frame sample</div>
             <pre><label id="dataFrame" class="d-flex data-sample"/>{data to be arrived}</pre>
-            <h5>code:adiyodi/01-display-webRTC</h5>
+            <h5>code:adiyodi/01-display-webSocket</h5>
         </div>
     </div>
 
 </body>
-<script src="/socket.io/socket.io.js"></script>
 <script src='scripts-common.js'></script>
 <script> initConsumer(); </script>
 
